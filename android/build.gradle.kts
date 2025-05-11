@@ -1,5 +1,7 @@
+// Define Kotlin version as a project-level extra property
+val kotlinVersion = "1.9.22"
+
 buildscript {
-    ext.kotlin_version = '1.9.22'
     repositories {
         google()
         mavenCentral()
@@ -7,7 +9,7 @@ buildscript {
 
     dependencies {
         classpath("com.android.tools.build:gradle:8.3.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
     }
 }
 
