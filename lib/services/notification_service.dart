@@ -13,7 +13,7 @@ class NotificationService {
   // Initialize notification service
   Future<void> init() async {
     // Request permissions
-    NotificationSettings settings = await _messaging.requestPermission(
+    await _messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,

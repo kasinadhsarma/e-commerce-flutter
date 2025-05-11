@@ -61,7 +61,7 @@ dependencies:
   # UI enhancements  
   flutter_svg: ^2.0.9
   shimmer: ^3.0.0          # For loading effects
-  intl: ^0.19.0            # For date/number formatting
+  intl: ^0.20.2            # For date/number formatting
   
   # Storage/Database
   cloud_firestore: ^4.13.3

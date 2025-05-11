@@ -54,7 +54,7 @@ class Order {
   final String? deliveryInstructions;
   final String? storeId;
   final Map<String, dynamic>? paymentDetails;
-  
+
   Order({
     required this.id,
     required this.userId,
@@ -78,25 +78,24 @@ class Order {
     this.storeId,
     this.paymentDetails,
   });
-  
+
   factory Order.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
-    
+
     // Parse items
-    final itemsList = (data['items'] as List? ?? []);
-    
+
     // Since we can't directly convert to CartItem without products,
-    // this is a simplified version that will need to be enhanced with 
+    // this is a simplified version that will need to be enhanced with
     // additional product fetching logic in a real implementation
     List<CartItem> items = [];
-    
+
     return Order(
       id: doc.id,
       userId: data['userId'],
       items: items, // Placeholder, needs product fetching logic
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      scheduledFor: data['scheduledFor'] != null 
-          ? (data['scheduledFor'] as Timestamp).toDate() 
+      scheduledFor: data['scheduledFor'] != null
+          ? (data['scheduledFor'] as Timestamp).toDate()
           : null,
       status: OrderStatus.values.firstWhere(
         (s) => s.toString() == 'OrderStatus.${data['status']}',
@@ -128,13 +127,14 @@ class Order {
       paymentDetails: data['paymentDetails'],
     );
   }
-  
+
   Map<String, dynamic> toFirestore() {
     return {
       'userId': userId,
       'items': items.map((item) => item.toJson()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
-      'scheduledFor': scheduledFor != null ? Timestamp.fromDate(scheduledFor!) : null,
+      'scheduledFor':
+          scheduledFor != null ? Timestamp.fromDate(scheduledFor!) : null,
       'status': status.toString().split('.').last,
       'deliveryMethod': deliveryMethod.toString().split('.').last,
       'paymentMethod': paymentMethod.toString().split('.').last,

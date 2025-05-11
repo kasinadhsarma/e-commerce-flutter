@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/order.dart';
+import '../models/order.dart' as app_models;
 import '../models/cart_item.dart';
 
 class OrderService {
@@ -8,7 +8,7 @@ class OrderService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Get all orders for the current user
-  Stream<List<Order>> getUserOrders() {
+  Stream<List<app_models.Order>> getUserOrders() {
     final userId = _auth.currentUser?.uid;
     if (userId == null) {
       return Stream.value([]);
@@ -20,12 +20,14 @@ class OrderService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => Order.fromFirestore(doc)).toList();
+      return snapshot.docs
+          .map((doc) => app_models.Order.fromFirestore(doc))
+          .toList();
     });
   }
 
   // Get a specific order by ID
-  Future<Order?> getOrderById(String orderId) async {
+  Future<app_models.Order?> getOrderById(String orderId) async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) {
       return null;
@@ -37,7 +39,7 @@ class OrderService {
     }
 
     // Verify that the order belongs to the current user
-    final order = Order.fromFirestore(doc);
+    final order = app_models.Order.fromFirestore(doc);
     if (order.userId != userId) {
       return null;
     }
@@ -48,8 +50,8 @@ class OrderService {
   // Create a new order
   Future<String> createOrder({
     required List<CartItem> items,
-    required DeliveryMethod deliveryMethod,
-    required PaymentMethod paymentMethod,
+    required app_models.DeliveryMethod deliveryMethod,
+    required app_models.PaymentMethod paymentMethod,
     required double subtotal,
     required double tax,
     required double deliveryFee,
@@ -77,10 +79,11 @@ class OrderService {
       'createdAt': Timestamp.fromDate(DateTime.now()),
       'scheduledFor':
           scheduledFor != null ? Timestamp.fromDate(scheduledFor) : null,
-      'status': OrderStatus.pending.toString().split('.').last,
+      'status': app_models.OrderStatus.pending.toString().split('.').last,
       'deliveryMethod': deliveryMethod.toString().split('.').last,
       'paymentMethod': paymentMethod.toString().split('.').last,
-      'paymentStatus': PaymentStatus.pending.toString().split('.').last,
+      'paymentStatus':
+          app_models.PaymentStatus.pending.toString().split('.').last,
       'subtotal': subtotal,
       'tax': tax,
       'deliveryFee': deliveryFee,
@@ -118,18 +121,19 @@ class OrderService {
     }
 
     // Check if the order can be canceled (only pending or confirmed orders)
-    final currentStatus = OrderStatus.values.firstWhere(
+    final currentStatus = app_models.OrderStatus.values.firstWhere(
       (s) => s.toString() == 'OrderStatus.${orderData['status']}',
-      orElse: () => OrderStatus.pending,
+      orElse: () => app_models.OrderStatus.pending,
     );
 
-    if (![OrderStatus.pending, OrderStatus.confirmed].contains(currentStatus)) {
+    if (![app_models.OrderStatus.pending, app_models.OrderStatus.confirmed]
+        .contains(currentStatus)) {
       throw Exception('Order cannot be canceled at this stage');
     }
 
     // Cancel the order
     await _firestore.collection('orders').doc(orderId).update({
-      'status': OrderStatus.canceled.toString().split('.').last,
+      'status': app_models.OrderStatus.canceled.toString().split('.').last,
     });
   }
 
