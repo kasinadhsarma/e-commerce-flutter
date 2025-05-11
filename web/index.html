@@ -21,7 +21,7 @@
   <meta name="description" content="E-Shop - A complete e-commerce Flutter application.">
 
   <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="E-Shop">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
@@ -86,6 +86,13 @@
       100% { transform: scale(1); }
     }
   </style>
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = null;
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
 </head>
 <body>
   <!-- Loading indicator that shows before Flutter renders -->
@@ -101,16 +108,25 @@
   </div>
 
   <script>
-    // Hide loading indicator once Flutter is ready
-    window.addEventListener('flutter-first-frame', function() {
-      var loadingElement = document.getElementById('loading');
-      if (loadingElement) {
-        loadingElement.remove();
-        document.body.style.backgroundColor = '';
-      }
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+            // Hide loading indicator once Flutter is ready
+            var loadingElement = document.getElementById('loading');
+            if (loadingElement) {
+              loadingElement.remove();
+              document.body.style.backgroundColor = '';
+            }
+          });
+        }
+      });
     });
   </script>
-  
-  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
