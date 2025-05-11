@@ -42,9 +42,9 @@ dependencies:
   badges: ^3.1.2               # For cart badge
   
   # Authentication
-  firebase_core: ^2.24.0
-  firebase_auth: ^4.15.0
-  google_sign_in: ^6.2.1
+  firebase_core: ^2.15.1
+  firebase_auth: ^4.7.3
+  google_sign_in: ^6.1.4
   sign_in_with_apple: ^5.0.0
   
   # Local authentication (biometrics)
@@ -55,16 +55,16 @@ dependencies:
   pay: ^1.1.2              # For Apple Pay/Google Pay
   
   # Notifications
-  firebase_messaging: ^14.7.3
-  flutter_local_notifications: ^16.1.0
+  firebase_messaging: ^14.6.7
+  flutter_local_notifications: ^15.1.0+1
   
   # UI enhancements  
   flutter_svg: ^2.0.9
   shimmer: ^3.0.0          # For loading effects
-  intl: ^0.20.2            # For date/number formatting
+  intl: "0.19.0"           # For date/number formatting
   
   # Storage/Database
-  cloud_firestore: ^4.13.3
+  cloud_firestore: ^4.8.5
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
