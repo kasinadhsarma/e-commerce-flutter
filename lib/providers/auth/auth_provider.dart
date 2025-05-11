@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/auth/user_model.dart';
-import '../services/auth_service.dart';
+import '../../models/auth/user_model.dart';
+import '../../services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum AuthStatus {
@@ -15,22 +15,22 @@ enum AuthStatus {
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   UserModel? _user;
   AuthStatus _status = AuthStatus.initial;
   String? _errorMessage;
-  
+
   // Getters
   UserModel? get user => _user;
   AuthStatus get status => _status;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
-  
+
   // Constructor - initialize and listen to auth state changes
   AuthProvider() {
     _init();
   }
-  
+
   // Initialize authentication state
   Future<void> _init() async {
     _authService.authStateChanges.listen((User? firebaseUser) async {
@@ -44,18 +44,22 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     });
   }
-  
+
   // Fetch user data from Firestore
   Future<void> _fetchUserData(User firebaseUser) async {
     try {
-      final docSnapshot = await _firestore.collection('users').doc(firebaseUser.uid).get();
-      
+      final docSnapshot =
+          await _firestore.collection('users').doc(firebaseUser.uid).get();
+
       if (docSnapshot.exists) {
         _user = UserModel.fromFirestore(docSnapshot);
       } else {
         // Create new user document if it doesn't exist
         final newUser = UserModel.fromFirebaseUser(firebaseUser);
-        await _firestore.collection('users').doc(firebaseUser.uid).set(newUser.toFirestore());
+        await _firestore
+            .collection('users')
+            .doc(firebaseUser.uid)
+            .set(newUser.toFirestore());
         _user = newUser;
       }
     } catch (e) {
@@ -65,21 +69,22 @@ class AuthProvider extends ChangeNotifier {
       _user = UserModel.fromFirebaseUser(firebaseUser);
     }
   }
-  
+
   // Sign up with email and password
-  Future<void> signUp(String email, String password, String? displayName) async {
+  Future<void> signUp(
+      String email, String password, String? displayName) async {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       final credential = await _authService.signUpWithEmail(email, password);
-      
+
       // Update display name if provided
       if (displayName != null && displayName.isNotEmpty) {
         await credential.user?.updateDisplayName(displayName);
       }
-      
+
       // User data will be updated via the auth state listener
     } catch (e) {
       _status = AuthStatus.error;
@@ -87,13 +92,13 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Sign in with email and password
   Future<void> signIn(String email, String password) async {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       await _authService.signInWithEmail(email, password);
       // User data will be updated via the auth state listener
@@ -103,13 +108,13 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Sign in with Google
   Future<void> signInWithGoogle() async {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       await _authService.signInWithGoogle();
       // User data will be updated via the auth state listener
@@ -119,13 +124,13 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Sign in with Apple
   Future<void> signInWithApple() async {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       await _authService.signInWithApple();
       // User data will be updated via the auth state listener
@@ -135,16 +140,14 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Phone number authentication - Step 1
   Future<void> verifyPhoneNumber(
-    String phoneNumber, 
-    Function(String verificationId) onCodeSent
-  ) async {
+      String phoneNumber, Function(String verificationId) onCodeSent) async {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       await _authService.verifyPhoneNumber(
         phoneNumber: phoneNumber,
@@ -171,7 +174,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Phone number authentication - Step 2
   Future<void> confirmPhoneVerification(
     String verificationId,
@@ -180,7 +183,7 @@ class AuthProvider extends ChangeNotifier {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       await _authService.confirmPhoneVerification(verificationId, smsCode);
       // User data will be updated via the auth state listener
@@ -190,11 +193,11 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Reset password
   Future<void> resetPassword(String email) async {
     _errorMessage = null;
-    
+
     try {
       await _authService.resetPassword(email);
     } catch (e) {
@@ -202,40 +205,41 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Biometric authentication setup
   Future<bool> canUseBiometrics() async {
     return await _authService.canUseBiometrics();
   }
-  
+
   // Enable biometric login
   Future<void> enableBiometricLogin(String email, String password) async {
     await _authService.enableBiometricLogin(email, password);
   }
-  
+
   // Check if biometric login is enabled
   Future<bool> isBiometricLoginEnabled() async {
     return await _authService.isBiometricLoginEnabled();
   }
-  
+
   // Authenticate with biometrics and login
   Future<void> authenticateWithBiometrics() async {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       final isAuthenticated = await _authService.authenticateWithBiometrics();
-      
+
       if (isAuthenticated) {
         final email = await _authService.getStoredEmail();
         final password = await _authService.getStoredPassword();
-        
+
         if (email != null && password != null) {
           await signIn(email, password);
         } else {
           _status = AuthStatus.error;
-          _errorMessage = 'Biometric authentication successful, but credentials not found.';
+          _errorMessage =
+              'Biometric authentication successful, but credentials not found.';
           notifyListeners();
         }
       } else {
@@ -249,7 +253,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Update user data
   Future<void> updateUserData({
     String? displayName,
@@ -258,17 +262,17 @@ class AuthProvider extends ChangeNotifier {
     Map<String, dynamic>? preferences,
   }) async {
     if (_user == null) return;
-    
+
     try {
       final userData = <String, dynamic>{};
-      
+
       if (displayName != null) userData['displayName'] = displayName;
       if (photoUrl != null) userData['photoUrl'] = photoUrl;
       if (addresses != null) userData['addresses'] = addresses;
       if (preferences != null) userData['preferences'] = preferences;
-      
+
       await _firestore.collection('users').doc(_user!.id).update(userData);
-      
+
       // Update local user data
       _user = _user!.copyWith(
         displayName: displayName,
@@ -276,7 +280,7 @@ class AuthProvider extends ChangeNotifier {
         addresses: addresses,
         preferences: preferences,
       );
-      
+
       notifyListeners();
     } catch (e) {
       if (kDebugMode) {
@@ -284,21 +288,21 @@ class AuthProvider extends ChangeNotifier {
       }
     }
   }
-  
+
   // Add loyalty points
   Future<void> addLoyaltyPoints(int points) async {
     if (_user == null) return;
-    
+
     try {
       await _firestore.collection('users').doc(_user!.id).update({
         'loyaltyPoints': FieldValue.increment(points),
       });
-      
+
       // Update local user data
       _user = _user!.copyWith(
         loyaltyPoints: _user!.loyaltyPoints + points,
       );
-      
+
       notifyListeners();
     } catch (e) {
       if (kDebugMode) {
@@ -306,21 +310,21 @@ class AuthProvider extends ChangeNotifier {
       }
     }
   }
-  
+
   // Use loyalty points
   Future<bool> useLoyaltyPoints(int points) async {
     if (_user == null || _user!.loyaltyPoints < points) return false;
-    
+
     try {
       await _firestore.collection('users').doc(_user!.id).update({
         'loyaltyPoints': FieldValue.increment(-points),
       });
-      
+
       // Update local user data
       _user = _user!.copyWith(
         loyaltyPoints: _user!.loyaltyPoints - points,
       );
-      
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -330,12 +334,12 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
   }
-  
+
   // Sign out
   Future<void> signOut() async {
     _status = AuthStatus.loading;
     notifyListeners();
-    
+
     try {
       await _authService.signOut();
       // Auth state listener will handle the rest

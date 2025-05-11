@@ -9,13 +9,13 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final LocalAuthentication _localAuth = LocalAuthentication();
-  
+
   // Check if user is logged in
   Stream<User?> get authStateChanges => _auth.authStateChanges();
-  
+
   // Get current user
   User? get currentUser => _auth.currentUser;
-  
+
   // Email sign up
   Future<UserCredential> signUpWithEmail(String email, String password) async {
     try {
@@ -27,7 +27,7 @@ class AuthService {
       throw _handleAuthException(e);
     }
   }
-  
+
   // Email sign in
   Future<UserCredential> signInWithEmail(String email, String password) async {
     try {
@@ -39,7 +39,7 @@ class AuthService {
       throw _handleAuthException(e);
     }
   }
-  
+
   // Phone number sign in - Step 1: Send verification code
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
@@ -56,7 +56,7 @@ class AuthService {
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
     );
   }
-  
+
   // Phone number sign in - Step 2: Confirm verification code
   Future<UserCredential> confirmPhoneVerification(
     String verificationId,
@@ -66,35 +66,36 @@ class AuthService {
       verificationId: verificationId,
       smsCode: smsCode,
     );
-    
+
     try {
       return await _auth.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     }
   }
-  
+
   // Google sign in
   Future<UserCredential> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
+
       if (googleUser == null) {
         throw Exception('Google sign in aborted');
       }
-      
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      
+
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       throw Exception('Failed to sign in with Google: $e');
     }
   }
-  
+
   // Apple sign in
   Future<UserCredential> signInWithApple() async {
     try {
@@ -104,18 +105,27 @@ class AuthService {
           AppleIDAuthorizationScopes.fullName,
         ],
       );
-      
+
       final OAuthCredential credential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode,
       );
-      
+
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       throw Exception('Failed to sign in with Apple: $e');
     }
   }
-  
+
+  // Sign in with credential
+  Future<UserCredential> signInWithCredential(AuthCredential credential) async {
+    try {
+      return await _auth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
+  }
+
   // Password reset
   Future<void> resetPassword(String email) async {
     try {
@@ -124,7 +134,7 @@ class AuthService {
       throw _handleAuthException(e);
     }
   }
-  
+
   // Sign out
   Future<void> signOut() async {
     try {
@@ -134,17 +144,17 @@ class AuthService {
       throw Exception('Failed to sign out: $e');
     }
   }
-  
+
   // Check biometric authentication availability
   Future<bool> canUseBiometrics() async {
     try {
       return await _localAuth.canCheckBiometrics &&
-             await _localAuth.isDeviceSupported();
+          await _localAuth.isDeviceSupported();
     } on PlatformException catch (_) {
       return false;
     }
   }
-  
+
   // Authenticate with biometrics
   Future<bool> authenticateWithBiometrics() async {
     try {
@@ -159,7 +169,7 @@ class AuthService {
       return false;
     }
   }
-  
+
   // Enable biometric login (stores user credentials securely)
   Future<void> enableBiometricLogin(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
@@ -167,25 +177,25 @@ class AuthService {
     await prefs.setString('auth_password', password);
     await prefs.setBool('biometric_enabled', true);
   }
-  
+
   // Check if biometric login is enabled
   Future<bool> isBiometricLoginEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('biometric_enabled') ?? false;
   }
-  
+
   // Get stored email for biometric login
   Future<String?> getStoredEmail() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_email');
   }
-  
+
   // Get stored password for biometric login
   Future<String?> getStoredPassword() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_password');
   }
-  
+
   // Handle Firebase Auth exceptions
   Exception _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
@@ -206,7 +216,8 @@ class AuthService {
       case 'user-disabled':
         return Exception('This user account has been disabled.');
       case 'account-exists-with-different-credential':
-        return Exception('An account already exists with the same email address.');
+        return Exception(
+            'An account already exists with the same email address.');
       case 'invalid-verification-code':
         return Exception('The verification code is invalid.');
       case 'invalid-verification-id':
