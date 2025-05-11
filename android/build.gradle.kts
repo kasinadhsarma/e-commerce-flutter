@@ -13,10 +13,10 @@ buildscript {
     }
 }
 
-// Set SDK and NDK locations using system properties instead
+// Set SDK locations using system properties instead
 System.setProperty("android.dir", "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk")
 System.setProperty("android.sdk.dir", "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk")
-System.setProperty("ndk.dir", "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk/ndk-bundle")
+// Removed NDK references
 
 allprojects {
     repositories {
@@ -27,7 +27,8 @@ allprojects {
     // Disable NDK auto-download for all projects
     project.plugins.withId("com.android.application") {
         project.extensions.configure<com.android.build.gradle.AppExtension> {
-            sdkDirectory = file("/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk")
+            // Set SDK directory via system property instead of direct assignment
+            // as sdkDirectory is likely a val that cannot be reassigned
         }
     }
 }
