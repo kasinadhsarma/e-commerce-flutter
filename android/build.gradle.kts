@@ -13,15 +13,22 @@ buildscript {
     }
 }
 
-// Add configuration to disable NDK download
-gradle.startParameter.projectProperties["android.dir"] = "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk"
-gradle.startParameter.projectProperties["android.sdk.dir"] = "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk"
-gradle.startParameter.projectProperties["ndk.dir"] = "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk/ndk-bundle"
+// Set SDK and NDK locations using system properties instead
+System.setProperty("android.dir", "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk")
+System.setProperty("android.sdk.dir", "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk")
+System.setProperty("ndk.dir", "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk/ndk-bundle")
 
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    
+    // Disable NDK auto-download for all projects
+    project.plugins.withId("com.android.application") {
+        project.extensions.configure<com.android.build.gradle.AppExtension> {
+            sdkDirectory = file("/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk")
+        }
     }
 }
 
