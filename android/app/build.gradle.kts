@@ -9,7 +9,12 @@ android {
     
     // Flutter sets compileSdkVersion, but we'll use a more explicit approach
     compileSdk = 34
-    ndkVersion = "26.1.10909125"
+    
+    // Use the NDK that's already installed in the Nix environment
+    ndkPath = System.getenv("ANDROID_NDK_HOME") ?: "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk/ndk-bundle"
+    
+    // Comment out ndkVersion to prevent automatic download attempts
+    // ndkVersion = "26.1.10909125"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

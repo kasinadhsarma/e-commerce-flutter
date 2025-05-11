@@ -13,6 +13,10 @@ fi
 # Navigate to project root
 cd "$(dirname "$0")"
 
+# Fix dependency conflicts before building
+echo "Fixing dependency conflicts..."
+flutter pub add intl:^0.20.2
+
 # Clean the project
 echo "Cleaning project..."
 flutter clean

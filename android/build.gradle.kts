@@ -13,6 +13,11 @@ buildscript {
     }
 }
 
+// Add configuration to disable NDK download
+gradle.startParameter.projectProperties["android.dir"] = "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk"
+gradle.startParameter.projectProperties["android.sdk.dir"] = "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk"
+gradle.startParameter.projectProperties["ndk.dir"] = "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk/ndk-bundle"
+
 allprojects {
     repositories {
         google()
