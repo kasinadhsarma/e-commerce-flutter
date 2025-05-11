@@ -206,6 +206,68 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Update notification preferences
+  Future<void> updateNotificationPreferences({
+    bool? orderUpdates,
+    bool? promotions,
+    bool? newProducts,
+  }) async {
+    if (_user == null) return;
+
+    try {
+      final currentPrefs = _user!.preferences;
+      final notificationPrefs =
+          currentPrefs['notifications'] as Map<String, dynamic>? ?? {};
+
+      final updatedNotificationPrefs = {
+        ...notificationPrefs,
+        if (orderUpdates != null) 'orderUpdates': orderUpdates,
+        if (promotions != null) 'promotions': promotions,
+        if (newProducts != null) 'newProducts': newProducts,
+      };
+
+      final updatedPrefs = {
+        ...currentPrefs,
+        'notifications': updatedNotificationPrefs,
+      };
+
+      await _firestore.collection('users').doc(_user!.id).update({
+        'preferences': updatedPrefs,
+      });
+
+      // Update local user data
+      _user = _user!.copyWith(
+        preferences: updatedPrefs,
+      );
+
+      notifyListeners();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating notification preferences: $e');
+      }
+    }
+  }
+
+  // Get notification preferences with defaults
+  Map<String, bool> getNotificationPreferences() {
+    if (_user == null) {
+      return {
+        'orderUpdates': true,
+        'promotions': true,
+        'newProducts': true,
+      };
+    }
+
+    final notificationPrefs =
+        _user!.preferences['notifications'] as Map<String, dynamic>? ?? {};
+
+    return {
+      'orderUpdates': notificationPrefs['orderUpdates'] ?? true,
+      'promotions': notificationPrefs['promotions'] ?? true,
+      'newProducts': notificationPrefs['newProducts'] ?? true,
+    };
+  }
+
   // Biometric authentication setup
   Future<bool> canUseBiometrics() async {
     return await _authService.canUseBiometrics();

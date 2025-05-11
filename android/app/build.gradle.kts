@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.eshop"
+    namespace = "com.example.ecommerce_app"
     
     // Flutter sets compileSdkVersion, but we'll use a more explicit approach
     compileSdk = 34
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.eshop"
+        applicationId = "com.example.ecommerce_app"
         minSdk = 21
         targetSdk = 34
         versionCode = 1
