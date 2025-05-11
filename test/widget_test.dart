@@ -9,11 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-import 'package:myapp/main.dart';
-import 'package:myapp/providers/product_provider.dart';
-import 'package:myapp/providers/cart_provider.dart';
-import 'package:myapp/providers/wishlist_provider.dart';
-import 'package:myapp/models/product.dart';
+import 'package:ecommerce_app/main.dart';
+import 'package:ecommerce_app/providers/product_provider.dart';
+import 'package:ecommerce_app/providers/cart_provider.dart';
+import 'package:ecommerce_app/providers/wishlist_provider.dart';
+import 'package:ecommerce_app/models/product.dart';
 
 void main() {
   // Mocked products for testing

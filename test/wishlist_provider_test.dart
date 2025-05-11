@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/models/product.dart';
-import 'package:myapp/providers/wishlist_provider.dart';
+import 'package:ecommerce_app/models/product.dart';
+import 'package:ecommerce_app/providers/wishlist_provider.dart';
 
 void main() {
   late WishlistProvider wishlistProvider;

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/models/product.dart';
-import 'package:myapp/models/cart_item.dart';
-import 'package:myapp/providers/cart_provider.dart';
+import 'package:ecommerce_app/models/product.dart';
+import 'package:ecommerce_app/models/cart_item.dart';
+import 'package:ecommerce_app/providers/cart_provider.dart';
 
 void main() {
   late CartProvider cartProvider;

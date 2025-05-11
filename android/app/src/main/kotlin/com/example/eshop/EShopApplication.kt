@@ -1,10 +1,10 @@
 package com.example.eshop
 
 import io.flutter.app.FlutterApplication
-import androidx.multidex.MultiDex
+import androidx.multidex.MultiDexApplication
 import android.content.Context
 
-class EShopApplication : FlutterApplication() {
+class EShopApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         // Initialize any native Android libraries or SDK configurations here
@@ -12,7 +12,6 @@ class EShopApplication : FlutterApplication() {
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
-        // Enable multidex support
-        MultiDex.install(this)
+        // MultiDex is automatically applied with MultiDexApplication
     }
 }
