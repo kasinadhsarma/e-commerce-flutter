@@ -10,8 +10,15 @@ android {
     // Flutter sets compileSdkVersion, but we'll use a more explicit approach
     compileSdk = 34
     
-    // NDK configurations completely removed
-    
+    // Comment out ndkPath and ndkVersion completely to avoid any NDK download attempts
+    // ndkPath = System.getenv("ANDROID_NDK_HOME") ?: "/nix/store/0w34z07sz8dn3bhdx01zq6qsk526zch4-androidsdk/libexec/android-sdk/ndk-bundle"
+    // ndkVersion = "26.1.10909125"
+
+    // Add this property to tell Gradle to skip NDK download
+    aaptOptions {
+        noCompress += listOf("so") // Don't compress native libraries
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
